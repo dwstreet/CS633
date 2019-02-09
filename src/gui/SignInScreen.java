@@ -1,4 +1,4 @@
-package application;
+package gui;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,6 +33,7 @@ public class SignInScreen {
 				alert.setTitle("Log-in Result");
 				if(doSignin(username.getText(), password.getText())) {
 					// log-in
+					Main.signIn();
 					alert.setContentText("Log-in Success!");
 				}
 				else {
