@@ -19,7 +19,7 @@ public class Main extends Application {
 			BorderPane root = new BorderPane();
 			
 			Scene initial = new Scene(root, 400, 400);
-			initial.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			initial.getStylesheets().add(getClass().getResource("../gui/application.css").toExternalForm());
 			
 			SignInScreen signIn = new SignInScreen();
 			
