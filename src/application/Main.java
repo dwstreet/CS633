@@ -1,5 +1,6 @@
-package gui;
+package application;
 	
+import gui.SignInScreen;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
