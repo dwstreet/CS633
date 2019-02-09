@@ -1,6 +1,5 @@
 package gui;
 
-import application.Main;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
