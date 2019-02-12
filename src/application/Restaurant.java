@@ -1,6 +1,7 @@
 package application;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class Restaurant {
@@ -9,7 +10,7 @@ public class Restaurant {
 	private String phone;
 	private Map<Date, WorkingDay> schedule;
 
-	public Restaurant(String name, String phone, int floatingSeats, int stableSeats, Map<Date, WorkingDay> schedule) {
+	public Restaurant(String name, String phone, Map<Date, WorkingDay> schedule) {
 
 		this.name = name;
 		this.phone = phone;
@@ -28,15 +29,15 @@ public class Restaurant {
 		return schedule;
 	}
 
-	public boolean makeReservation(String partyName, int partyNumber, int year, int month, int day) {
+	public boolean makeReservation(String partyName, int partyNumber, int year, int month, int day, DayTime mealTime) {
 
 		@SuppressWarnings("deprecation")
 		Date date = new Date(year, month, day);
 		
-		return makeReservation(partyName, partyNumber, date);
+		return makeReservation(partyName, partyNumber, date, mealTime);
 	}
 
-	public boolean makeReservation(String partyName, int partyNumber, Date date) {
+	public boolean makeReservation(String partyName, int partyNumber, Date date, DayTime mealTime) {
 
 		// if the restaurant is not open can't make a reservation... I dunno how this realistically happens in the code but lets prevent that case
 		if(!schedule.containsKey(date)) {
@@ -45,8 +46,8 @@ public class Restaurant {
 		else {
 			WorkingDay day = schedule.get(date);
 			
-			if(day.canBook(partyName, partyNumber)) {
-				day.makeReservation(partyName, partyNumber);
+			if(day.canBook(partyName, partyNumber, mealTime)) {
+				day.makeReservation(partyName, partyNumber, mealTime);
 				return true;
 			}
 			else {
@@ -55,15 +56,15 @@ public class Restaurant {
 		}
 	}
 
-	public boolean addWorkingDay(int year, int month, int day, int floatingSeats, int stableSeats) {
+	public boolean addWorkingDay(int year, int month, int day, List<Shift> shifts, List<Reservation> reservations) {
 
 		@SuppressWarnings("deprecation")
 		Date date = new Date(year, month, day);
 
-		return addWorkingDay(date, floatingSeats, stableSeats);
+		return addWorkingDay(date, shifts, reservations);
 	}
 
-	public boolean addWorkingDay(Date date, int floatingSeats, int stableSeats) {
+	public boolean addWorkingDay(Date date, List<Shift> shifts, List<Reservation> reservations) {
 
 		//This information should be passed upwards to the GUI. 
 		
@@ -74,7 +75,12 @@ public class Restaurant {
 //					+ "scheduled occurs before today.");
 		}
 
-		schedule.put(date, new WorkingDay(floatingSeats, stableSeats));
+		schedule.put(date, new WorkingDay(shifts, reservations));
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }
