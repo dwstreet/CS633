@@ -35,4 +35,15 @@ public class Shift implements Comparable<Shift> {
 		return mealTime.getStartTime().compareTo(o.mealTime.getStartTime());
 	}
 
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(mealTime);
+		sb.append("  ");
+		sb.append(floatingSeats + stableSeats);
+		sb.append(" open seats");
+		
+		return sb.toString();
+	}
 }

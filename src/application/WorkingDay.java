@@ -24,8 +24,16 @@ public class WorkingDay {
 		shifts.add(new Shift(new MealTime(startTime, endTime), floatingSeats, stableSeats));
 	}
 	
+	public boolean isClosed() {
+		return shifts.isEmpty();
+	}
+	
 	public List<Shift> getShifts() {
 		return shifts;
+	}
+	
+	public boolean hasShifts() {
+		return !shifts.isEmpty();
 	}
 	
 	public void makeReservation(String partyName, int partyNumber, DayTime seatTime) {

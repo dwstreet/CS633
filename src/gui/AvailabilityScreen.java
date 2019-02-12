@@ -1,23 +1,22 @@
 package gui;
 
-import java.awt.Event;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 
+import application.DayMonthYear;
 import application.Main;
 import application.Restaurant;
+import application.Shift;
 import application.WorkingDay;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -25,71 +24,62 @@ public class AvailabilityScreen {
 
 	private HBox top;
 	private VBox center;
-	private DatePicker datePicker; 
+	private BorderStroke borderStroke = new BorderStroke(null, BorderStrokeStyle.SOLID, null, null);
+	private ComboBox<Restaurant> restComboBox;
+	private DatePicker datePicker = new DatePicker(LocalDate.now()); 
 	
-	public AvailabilityScreen() {
+	public AvailabilityScreen(List<Restaurant> restaurants) {
 		
-		//This is where reading of a file of restaurants would be helpful. 
+		//The availability screens should get passed in restaurants 
 		
+		restComboBox = new ComboBox<Restaurant>(FXCollections.observableList(restaurants));
+		restComboBox.setMinWidth(200);
 		
-		///////////////////////////////////////////////////////////////////
+		restComboBox.getSelectionModel().selectedItemProperty().addListener( (observable, oldVal, newVal) -> {
+			buildCenterDisplay();
+			updateAvailability();
+		});
 		
-		datePicker = new DatePicker();
-		datePicker.setValue(LocalDate.now());
-		ComboBox<Restaurant> restaurants = new ComboBox<Restaurant>(FXCollections.observableList(Main.getRestaurants()));
-		restaurants.setMinWidth(200);
+		restComboBox.setValue(restaurants.get(0));
 		
-		restaurants.getSelectionModel().selectedItemProperty().addListener( 
-				
-			new ChangeListener<Restaurant>() {
-
-				@Override
-				public void changed(ObservableValue<? extends Restaurant> observable, Restaurant oldValue,
-						Restaurant newValue) {
-					buildCenterDisplay(newValue);
-				}
-				
-			}
-		);
-		
-		restaurants.setValue(Main.getRestaurants().get(0));
-		
-		// buildCenterDisplay(restaurants.getValue());
-		
-		// use this stuff later... just left here as reference on how to get the information out of the date picker.
-//		int day = datePicker.getValue().getDayOfMonth();
-//		int month = datePicker.getValue().getMonthValue();
-//		int year = datePicker.getValue().getYear();
+		datePicker.setOnAction( event -> {
+			buildCenterDisplay(); 
+			updateAvailability();
+		});
 		
 		top = new HBox();
-		top.getChildren().addAll(restaurants, datePicker);
+		top.getChildren().addAll(restComboBox, datePicker);
 		top.setAlignment(Pos.CENTER);		
 		
 	}
 	
-	private void buildCenterDisplay(Restaurant rest) {
-		
+	private Node buildCenterDisplay() {
+			
 		center = new VBox();
+		center.setAlignment(Pos.CENTER);
 		
 		int day = datePicker.getValue().getDayOfMonth();
 		int month = datePicker.getValue().getMonthValue();
 		int year = datePicker.getValue().getYear();
-		Date selectedDay = new Date(year, month, day);
 		
-		List<WorkingDay> display = new ArrayList<>();
-		for(Entry<Date, WorkingDay> workday : rest.getSchedule().entrySet()) {			
-			// If the date has not yet passed add it to display
-			if(workday.getKey().after(selectedDay)) {
-				display.add(workday.getValue());
-			}
+		DayMonthYear selectedDay = new DayMonthYear(day, month, year);
+		WorkingDay workingDay = restComboBox.getValue().getSchedule().get(selectedDay);
+		
+		// if the restaurant doesn't have a working day for that day or that day doesn't have any shifts
+		if(workingDay == null || workingDay.isClosed()) {
+			center.getChildren().add(new Label(restComboBox.getValue().getName() + " is not open on " + selectedDay.toString()));
+		}
+		else {
+			for(Shift s : workingDay.getShifts()) {
+				HBox box = new HBox();
+				box.setAlignment(Pos.CENTER);
+				box.getChildren().addAll(new Label(s.toString()));
+				box.setBorder(new Border(borderStroke));
+				center.getChildren().add(box);
+			}		
 		}
 		
-		// only include 7 dates from selected date
-		for(int i = 0; i < 7;) {
-			WorkingDay workday = display.get(i);
-			//workday.canBook("", 1);
-		}
-		
+		return center;
 	}
 			
 	public Node getTop() {
@@ -101,6 +91,7 @@ public class AvailabilityScreen {
 	}
 	
 	public void updateAvailability() {
-		//not yet implemented
+		
+		Main.updateExternal(getTop(), null, buildCenterDisplay(), null, null);
 	}
 }
