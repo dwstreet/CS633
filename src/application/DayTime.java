@@ -36,7 +36,15 @@ public class DayTime implements Comparable<DayTime> {
 		StringBuilder sb = new StringBuilder();
 		sb.append(hour % 12);
 		sb.append(":");
-		sb.append(minute);
+		
+		// Prepend appropriate 0
+		if(minute < 10) {
+			sb.append("0").append(minute);
+		}
+		else {
+			 sb.append(minute);
+		}
+		
 		if(hour > 12) {
 			sb.append("PM");
 		}

@@ -17,4 +17,9 @@ public class MealTime {
 	public DayTime getEndTime() {
 		return endTime;
 	}
+	
+	@Override
+	public String toString() {
+		return startTime + "-" + endTime;
+	}
 }
