@@ -7,6 +7,7 @@ import application.DayTime;
 import application.Main;
 import application.Restaurant;
 import application.Shift;
+import application.User;
 import application.WorkingDay;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -73,37 +74,42 @@ public class CreateReservationScreen implements Screen {
 				alert.showAndWait();
 			}
 			else {
-				int partyOf = Integer.parseInt(partyNumStr );
-				DayTime seatTime = shift.getMealTime().getStartTime();
+				if(Main.isLoggedIn()) {
+					User user = Main.getLoggedInUser();
+					int partyOf = Integer.parseInt(partyNumStr );
+					DayTime seatTime = shift.getMealTime().getStartTime();
 
-				if(workday.canBook(partyName, partyOf, seatTime)) {
-					
-					if(Main.isLoggedIn()) {
+					if(workday.canBook(user, partyName, partyOf, seatTime)) {
 
 						alert.setAlertType(AlertType.CONFIRMATION);
 						alert.setTitle("Reservation Confirmed!");
 						alert.setContentText("Your reservation has been booked");
-						
-						workday.makeReservation(partyName, partyOf, seatTime, notes.getText());
-						
-						alert.showAndWait();	
+
+						workday.makeReservation(user, partyName, partyOf, seatTime, notes.getText());
+
+						alert.showAndWait();
+						Main.goToAvailability();
 					}
 					else {
-						Main.goToSignIn();
+						alert.setAlertType(AlertType.WARNING);
+						alert.setTitle("Cannot Book");
+
+						if(partyOf > shift.getFloatingSeats() + restaurant.getTableSeats()) {
+							alert.setContentText("This reservation has more seats than we can handle at this time.");			
+						}
+						else {
+							alert.setContentText("This reservation already exists!");
+						}
+						alert.showAndWait();
 					}
-					
+
 				}
 				else {
 					alert.setAlertType(AlertType.WARNING);
-					alert.setTitle("Cannot Book");
-
-					if(partyOf > shift.getFloatingSeats() + shift.getStableSeats()) {
-						alert.setContentText("This reservation has more seats than we can handle at this time.");			
-					}
-					else {
-						alert.setContentText("This reservation already exists!");
-					}
+					alert.setTitle("Sign-In");
+					alert.setContentText("Must sign in before creating a reservation.");
 					alert.showAndWait();
+					Main.goToSignIn();
 				}
 			}
 		});

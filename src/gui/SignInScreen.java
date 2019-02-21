@@ -1,6 +1,7 @@
 package gui;
 
 import application.Main;
+import application.User;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -38,11 +39,13 @@ public class SignInScreen implements Screen {
 				alert.setTitle("Log-in Result");
 				String user = username.getText();
 				String pass = password.getText();
-				if(doSignIn(user, pass)) {
+				
+				User userToCheck = Main.getAllUsers().get(user);
+				if(doSignIn(userToCheck, pass)) {
 					// log-in
 					alert.setContentText("Log-in Success!");
 					alert.showAndWait();
-					Main.setLoggedIn(true);
+					Main.setLoggedIn(true, userToCheck);
 					
 					// If the sign-in was reached from another screen (e.g. create reservation)
 					// then go back to that screen otherwise go to availability.
@@ -82,9 +85,9 @@ public class SignInScreen implements Screen {
 		center.setAlignment(Pos.CENTER);	
 	}
 	
-	private boolean doSignIn(String user, String pass) {
+	private boolean doSignIn(User user, String pass) {
 
-		return user.equals("Dan") && pass.equals("pass");
+		return user.authenticate(pass);
 	}
 	
 	@Override

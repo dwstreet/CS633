@@ -1,6 +1,7 @@
 package application;
 
-import java.util.Date;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class DayMonthYear implements Comparable<DayMonthYear>{
 
@@ -10,8 +11,8 @@ public class DayMonthYear implements Comparable<DayMonthYear>{
 
 	public static DayMonthYear today() {
 		
-		Date today = new Date();
-		return new DayMonthYear(today.getDay(), today.getMonth(), today.getYear());
+		Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+		return new DayMonthYear(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
 	}
 	
 	public DayMonthYear(int day, int month, int year) {

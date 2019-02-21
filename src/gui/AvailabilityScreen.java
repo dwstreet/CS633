@@ -1,7 +1,6 @@
 package gui;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import application.DayMonthYear;
 import application.Main;
@@ -17,6 +16,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 public class AvailabilityScreen implements Screen {
 
@@ -24,17 +24,17 @@ public class AvailabilityScreen implements Screen {
 	private VBox left;
 	private VBox center;
 	private VBox right;
-	private HBox bottom; 
+	private VBox bottom; 
 
 	//private BorderStroke borderStroke = new BorderStroke(null, BorderStrokeStyle.SOLID, null, null);
 	private ComboBox<Restaurant> restComboBox;
 	private DatePicker datePicker = new DatePicker(LocalDate.now()); 
 
-	public AvailabilityScreen(List<Restaurant> restaurants) {
+	public AvailabilityScreen() {
 
 		//The availability screens should get passed in restaurants 
 
-		restComboBox = new ComboBox<Restaurant>(FXCollections.observableList(restaurants));
+		restComboBox = new ComboBox<Restaurant>(FXCollections.observableList(Main.getAllRestaurants()));
 		restComboBox.setMinWidth(200);
 
 		restComboBox.getSelectionModel().selectedItemProperty().addListener( (observable, oldVal, newVal) -> {
@@ -42,7 +42,7 @@ public class AvailabilityScreen implements Screen {
 			updateAvailability();
 		});
 
-		restComboBox.setValue(restaurants.get(0));
+		restComboBox.setValue(Main.getAllRestaurants().get(0));
 
 		datePicker.setOnAction( event -> {
 			buildCenterDisplay(); 
@@ -53,8 +53,9 @@ public class AvailabilityScreen implements Screen {
 		top.getChildren().addAll(restComboBox, datePicker);
 		top.setAlignment(Pos.CENTER);		
 
-		bottom = new HBox();
-		bottom.getChildren().add(new Label("For other custom reservations please call us at: " + restComboBox.getValue().getPhone()));
+		bottom = new VBox(5);
+		Restaurant rest = restComboBox.getValue();
+		bottom.getChildren().addAll(new Label("Tables seat: " + rest.getTableSeats() + " people"), new Label("For other custom reservations please call us at: " + rest.getPhone()));
 		bottom.setAlignment(Pos.CENTER);
 
 		left = new VBox();
@@ -126,7 +127,8 @@ public class AvailabilityScreen implements Screen {
 		else {
 			right = new VBox();
 			right.setAlignment(Pos.BOTTOM_RIGHT);
-			Button manageResv = new Button("Manage Reservations");
+			Button manageResv = new Button("Manage\nReservations");
+			manageResv.setTextAlignment(TextAlignment.CENTER);
 			manageResv.setOnAction(event -> Main.goToManageReservation() );
 			right.getChildren().add(manageResv);
 		}
