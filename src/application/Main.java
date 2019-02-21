@@ -91,6 +91,10 @@ public class Main extends Application {
 		changeScreen(availability);
 	}
 	
+	public static boolean stackHasSeveralItems() {
+		return screenStack.size() > 1;
+	}
+	
 	public static void goToCreateReservation(Restaurant rest, DayMonthYear dmy, Shift shift) {
 		
 		changeScreen(new CreateReservationScreen(rest, dmy, shift));

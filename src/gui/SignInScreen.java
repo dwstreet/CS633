@@ -43,7 +43,15 @@ public class SignInScreen implements Screen {
 					alert.setContentText("Log-in Success!");
 					alert.showAndWait();
 					Main.setLoggedIn(true);
-					Main.goToAvailability();
+					
+					// If the sign-in was reached from another screen (e.g. create reservation)
+					// then go back to that screen otherwise go to availability.
+					if(Main.stackHasSeveralItems()) {
+						Main.backScreen();
+					}
+					else {
+						Main.goToAvailability();
+					}
 				}
 				else {
 					// display error

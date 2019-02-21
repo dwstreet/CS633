@@ -37,7 +37,7 @@ public class Reservation {
 
 		Reservation otherRes = (Reservation) o;
 
-		return this.partyName == otherRes.partyName && this.seatTime == otherRes.seatTime;
+		return this.partyName.equals(otherRes.partyName) && this.seatTime.equals(otherRes.seatTime);
 	}
 
 	@Override
