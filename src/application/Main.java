@@ -24,7 +24,6 @@ public class Main extends Application {
 	
 	private static SignInScreen signIn;
 	private static AvailabilityScreen availability;
-	private static CreateReservationScreen resvCreate;
 
 	@Override
 	public void start(Stage stage) {
@@ -38,10 +37,10 @@ public class Main extends Application {
 			// This is a temporary impl so I can test out gui stuff.
 			Map<DayMonthYear, WorkingDay> schedule = new HashMap<>();
 
-			DayMonthYear tomorrow = new DayMonthYear(13, 2, 2019);
+			DayMonthYear tomorrow = new DayMonthYear(21, 2, 2019);
 			WorkingDay exampleDay = new WorkingDay();
 			exampleDay.makeShift(new DayTime(18, 0), new DayTime(19, 30), 5, 10);
-			exampleDay.makeReservation("Dan", 3, new DayTime(18, 0));
+			exampleDay.makeReservation("Dan", 3, new DayTime(18, 0), "");
 
 			schedule.put(tomorrow, exampleDay);
 			Restaurant rest = new Restaurant("Burger Joint", "123-456-7890", schedule);
@@ -54,14 +53,9 @@ public class Main extends Application {
 
 			// Setting up sign in
 			signIn = new SignInScreen();
+			availability = new AvailabilityScreen(restaurantList);
 
-//			// Checking out availability
-			availability = new AvailabilityScreen(restaurantList, loggedIn);
-//			
-//			// Checking out CreateReservation
-			resvCreate = new CreateReservationScreen(rest, tomorrow, exampleDay.getShifts().get(0), loggedIn);
-			
-
+			screenStack.push(signIn);
 			changeScreen(signIn);
 			
 			stage.setTitle("Welcome");
@@ -86,7 +80,7 @@ public class Main extends Application {
 		root.setLeft(screen.getLeft());
 		root.setCenter(screen.getCenter());
 		root.setRight(screen.getRight());
-		root.setBottom(screen.getLeft());
+		root.setBottom(screen.getBottom());
 	}
 	
 	public static void goToSignIn() {
@@ -97,8 +91,9 @@ public class Main extends Application {
 		changeScreen(availability);
 	}
 	
-	public static void goToCreateReservation() {
-		changeScreen(resvCreate);
+	public static void goToCreateReservation(Restaurant rest, DayMonthYear dmy, Shift shift) {
+		
+		changeScreen(new CreateReservationScreen(rest, dmy, shift));
 	}
 	
 	
@@ -117,8 +112,12 @@ public class Main extends Application {
 		}
 	}
 	
-	public static void isLoggedIn(boolean logdIn) {
+	public static void setLoggedIn(boolean logdIn) {
 		loggedIn = logdIn;
+	}
+	
+	public static boolean isLoggedIn() {
+		return loggedIn;
 	}
 
 	public static void main(String[] args) {

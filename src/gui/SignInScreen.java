@@ -30,7 +30,7 @@ public class SignInScreen implements Screen {
 		Button guest = new Button("Continue as Guest");
 		Button signIn = new Button("Sign In");
 
-		guest.setOnAction( event -> System.out.println("Guest Pressed") /* move on as guest */);
+		guest.setOnAction( event -> Main.goToAvailability());
 		signIn.setOnAction( event -> 
 			{ 
 
@@ -38,17 +38,18 @@ public class SignInScreen implements Screen {
 				alert.setTitle("Log-in Result");
 				String user = username.getText();
 				String pass = password.getText();
-				if(doSignin(user, pass)) {
+				if(doSignIn(user, pass)) {
 					// log-in
 					alert.setContentText("Log-in Success!");
-					Main.isLoggedIn(doSignin(user, pass));
+					alert.showAndWait();
+					Main.setLoggedIn(true);
+					Main.goToAvailability();
 				}
 				else {
 					// display error
 					alert.setContentText("Wrong Username or password!");
+					alert.showAndWait();
 				}
-			
-				alert.showAndWait();
 			}
 		);
 		
@@ -73,7 +74,7 @@ public class SignInScreen implements Screen {
 		center.setAlignment(Pos.CENTER);	
 	}
 	
-	private boolean doSignin(String user, String pass) {
+	private boolean doSignIn(String user, String pass) {
 
 		return user.equals("Dan") && pass.equals("pass");
 	}

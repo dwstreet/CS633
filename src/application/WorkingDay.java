@@ -36,9 +36,9 @@ public class WorkingDay {
 		return !shifts.isEmpty();
 	}
 	
-	public void makeReservation(String partyName, int partyNumber, DayTime seatTime) {
+	public void makeReservation(String partyName, int partyNumber, DayTime seatTime, String notes) {
 
-		reservations.add(new Reservation(partyName, partyNumber, seatTime));		
+		reservations.add(new Reservation(partyName, partyNumber, seatTime, notes));
 	}
 
 	// This may be used by other screens
@@ -62,7 +62,7 @@ public class WorkingDay {
 		Shift shift = findShift(seatTime);
 
 		// Ensure the party size is small enough and not already booked
-		return partyOf < (shift.getFloatingSeats() + shift.getStableSeats()) && !reservations.contains(new Reservation(partyName, partyOf, seatTime));
+		return partyOf < (shift.getFloatingSeats() + shift.getStableSeats()) && !reservations.contains(new Reservation(partyName, partyOf, seatTime, ""));
 	}
 	
 	private Shift findShift(DayTime seatTime) {

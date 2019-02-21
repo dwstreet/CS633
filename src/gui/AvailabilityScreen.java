@@ -15,9 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -26,14 +23,14 @@ public class AvailabilityScreen implements Screen {
 	private HBox top;
 	private VBox left;
 	private VBox center;
-	private Node right = null; // Not used on this screen, kept for interface
+	private VBox right;
 	private HBox bottom; 
-	
-	private BorderStroke borderStroke = new BorderStroke(null, BorderStrokeStyle.SOLID, null, null);
+
+	//private BorderStroke borderStroke = new BorderStroke(null, BorderStrokeStyle.SOLID, null, null);
 	private ComboBox<Restaurant> restComboBox;
 	private DatePicker datePicker = new DatePicker(LocalDate.now()); 
 
-	public AvailabilityScreen(List<Restaurant> restaurants, boolean loggedIn) {
+	public AvailabilityScreen(List<Restaurant> restaurants) {
 
 		//The availability screens should get passed in restaurants 
 
@@ -61,7 +58,11 @@ public class AvailabilityScreen implements Screen {
 		bottom.setAlignment(Pos.CENTER);
 
 		left = new VBox();
-		left.getChildren().add(new Button("Back"));
+		left.setAlignment(Pos.BOTTOM_LEFT);
+		Button back = new Button("Back");
+		back.setOnAction(event -> Main.backScreen() );
+		left.getChildren().add(back);
+		
 	}
 
 	private Node buildCenterDisplay() {
@@ -77,15 +78,19 @@ public class AvailabilityScreen implements Screen {
 		WorkingDay workingDay = restComboBox.getValue().getSchedule().get(selectedDay);
 
 		// if the restaurant doesn't have a working day for that day or that day doesn't have any shifts
-		if(workingDay == null || workingDay.isClosed()) {
+		if(workingDay == null || workingDay.isClosed()) {			
 			center.getChildren().add(new Label(restComboBox.getValue().getName() + " is not open on " + selectedDay.toString()));
 		}
 		else {
-			for(Shift s : workingDay.getShifts()) {
-				HBox box = new HBox();
+			for(Shift shift : workingDay.getShifts()) {
+				HBox box = new HBox(10);
 				box.setAlignment(Pos.CENTER);
-				box.getChildren().addAll(new Label(s.toString()));
-				box.setBorder(new Border(borderStroke));
+				
+				Button makeResv = new Button("Make Reservation");
+				makeResv.setOnAction(event -> Main.goToCreateReservation(restComboBox.getValue(), selectedDay, shift));
+				
+				box.getChildren().addAll(new Label(shift.toString()), makeResv);
+				//box.setBorder(new Border(borderStroke));
 				center.getChildren().add(box);
 			}		
 		}
@@ -110,6 +115,22 @@ public class AvailabilityScreen implements Screen {
 
 	@Override
 	public Node getRight() {
+		
+		if(!Main.isLoggedIn()) {
+			right = new VBox();
+			right.setAlignment(Pos.BOTTOM_RIGHT);
+			Button signIn = new Button("Sign-In");
+			signIn.setOnAction(event -> Main.goToSignIn() );
+			right.getChildren().add(signIn);
+		}
+		else {
+			right = new VBox();
+			right.setAlignment(Pos.BOTTOM_RIGHT);
+			Button manageResv = new Button("Manage Reservations");
+			manageResv.setOnAction(event -> Main.goToManageReservation() );
+			right.getChildren().add(manageResv);
+		}
+		
 		return right;
 	}
 
@@ -119,7 +140,7 @@ public class AvailabilityScreen implements Screen {
 	}
 
 	public void updateAvailability() {
-		
+
 		buildCenterDisplay();
 		Main.changeScreen(this);
 	}

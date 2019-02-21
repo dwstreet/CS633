@@ -28,14 +28,14 @@ public class Restaurant {
 		return schedule;
 	}
 
-	public boolean makeReservation(String partyName, int partyNumber, int year, int month, int day, DayTime mealTime) {
+	public boolean makeReservation(String partyName, int partyNumber, int year, int month, int day, DayTime mealTime, String notes) {
 
 		DayMonthYear date = new DayMonthYear(year, month, day);
 		
-		return makeReservation(partyName, partyNumber, date, mealTime);
+		return makeReservation(partyName, partyNumber, date, mealTime, notes);
 	}
 
-	public boolean makeReservation(String partyName, int partyNumber, DayMonthYear date, DayTime mealTime) {
+	public boolean makeReservation(String partyName, int partyNumber, DayMonthYear date, DayTime mealTime, String notes) {
 
 		// if the restaurant is not open can't make a reservation... I dunno how this realistically happens in the code but lets prevent that case
 		if(!schedule.containsKey(date)) {
@@ -45,7 +45,7 @@ public class Restaurant {
 			WorkingDay day = schedule.get(date);
 			
 			if(day.canBook(partyName, partyNumber, mealTime)) {
-				day.makeReservation(partyName, partyNumber, mealTime);
+				day.makeReservation(partyName, partyNumber, mealTime, notes);
 				return true;
 			}
 			else {
