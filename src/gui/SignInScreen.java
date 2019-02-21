@@ -1,5 +1,6 @@
 package gui;
 
+import application.Main;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -11,9 +12,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class SignInScreen {
+public class SignInScreen implements Screen {
 	
+	private VBox top;
+	private VBox left;
 	private VBox center;
+	private VBox right;
+	private VBox bottom;
 
 	public SignInScreen() {
 		
@@ -31,9 +36,12 @@ public class SignInScreen {
 
 				Alert alert = new Alert(AlertType.CONFIRMATION);
 				alert.setTitle("Log-in Result");
-				if(doSignin(username.getText(), password.getText())) {
+				String user = username.getText();
+				String pass = password.getText();
+				if(doSignin(user, pass)) {
 					// log-in
 					alert.setContentText("Log-in Success!");
+					Main.isLoggedIn(doSignin(user, pass));
 				}
 				else {
 					// display error
@@ -65,13 +73,33 @@ public class SignInScreen {
 		center.setAlignment(Pos.CENTER);	
 	}
 	
-	public Node getScreen() {
-		return center;
+	private boolean doSignin(String user, String pass) {
+
+		return user.equals("Dan") && pass.equals("pass");
 	}
 	
-	private boolean doSignin(String user, String pass) {
-		
-		
-		return user.equals("Dan") && pass.equals("pass");
+	@Override
+	public Node getTop() {
+		return top;
+	}
+
+	@Override
+	public Node getLeft() {
+		return left;
+	}
+
+	@Override
+	public Node getCenter() {
+		return center;
+	}
+
+	@Override
+	public Node getRight() {
+		return right;
+	}
+
+	@Override
+	public Node getBottom() {
+		return bottom;
 	}
 }

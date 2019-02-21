@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import gui.AvailabilityScreen;
+import gui.CreateReservationScreen;
+import gui.Screen;
 import gui.SignInScreen;
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -16,8 +18,13 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-	private static boolean signedIn = false;
-	private static BorderPane root = new BorderPane(); 
+	private static boolean loggedIn = false;
+	private static BorderPane root = new BorderPane();
+	private static Stack<Screen> screenStack = new Stack<>();
+	
+	private static SignInScreen signIn;
+	private static AvailabilityScreen availability;
+	private static CreateReservationScreen resvCreate;
 
 	@Override
 	public void start(Stage stage) {
@@ -45,16 +52,18 @@ public class Main extends Application {
 			Scene initial = new Scene(root, 400, 400);
 			initial.getStylesheets().add(getClass().getResource("../gui/application.css").toExternalForm());
 
-			SignInScreen signIn = new SignInScreen();
-			AvailabilityScreen availability = new AvailabilityScreen(restaurantList);
-
 			// Setting up sign in
-			root.setCenter(signIn.getScreen());
+			signIn = new SignInScreen();
 
-			// Checking out availability
-			root.setTop(availability.getTop());
-			root.setCenter(availability.getCenter());
+//			// Checking out availability
+			availability = new AvailabilityScreen(restaurantList, loggedIn);
+//			
+//			// Checking out CreateReservation
+			resvCreate = new CreateReservationScreen(rest, tomorrow, exampleDay.getShifts().get(0), loggedIn);
+			
 
+			changeScreen(signIn);
+			
 			stage.setTitle("Welcome");
 			stage.setScene(initial);
 			stage.show();
@@ -65,17 +74,51 @@ public class Main extends Application {
 		}
 	}
 
-	public static void updateExternal(Node top, Node left, Node center, Node right, Node bottom) {
+	public static void changeScreen(Screen screen) {
 
-		root.setTop(top);
-		root.setLeft(left);
-		root.setCenter(center);
-		root.setRight(right);
-		root.setBottom(bottom);
+		// If the screen is not the currently displayed screen
+		// no the != here is not a bug, literal memory address compare
+		if(!screenStack.isEmpty() && screenStack.peek() != screen) {
+			screenStack.push(screen);
+		}
+		
+		root.setTop(screen.getTop());
+		root.setLeft(screen.getLeft());
+		root.setCenter(screen.getCenter());
+		root.setRight(screen.getRight());
+		root.setBottom(screen.getLeft());
 	}
-
-	static void signIn() {
-		signedIn = true;
+	
+	public static void goToSignIn() {
+		changeScreen(signIn);
+	}
+	
+	public static void goToAvailability() {
+		changeScreen(availability);
+	}
+	
+	public static void goToCreateReservation() {
+		changeScreen(resvCreate);
+	}
+	
+	
+	public static void goToManageReservation() {
+		changeScreen(null);
+	}
+	
+	public static void goToManageRestaurants() {
+		changeScreen(null);
+	}
+	
+	public static void backScreen() {
+		if(!screenStack.isEmpty()) {
+			screenStack.pop();
+			changeScreen(screenStack.peek());
+		}
+	}
+	
+	public static void isLoggedIn(boolean logdIn) {
+		loggedIn = logdIn;
 	}
 
 	public static void main(String[] args) {
