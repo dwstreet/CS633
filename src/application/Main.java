@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
+import gui.AddShiftScreen;
 import gui.AvailabilityScreen;
+import gui.CreateReservationScreen;
+import gui.ManageReservationScreen;
+import gui.ManageRestaurantsScreen;
+import gui.Screen;
 import gui.SignInScreen;
+import gui.UpdateShiftScreen;
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -16,8 +22,15 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-	private static boolean signedIn = false;
-	private static BorderPane root = new BorderPane(); 
+	private static boolean loggedIn = false;
+	private static User loggedInUser = null;
+	private static Map<String, User> allUsers = new HashMap<>();
+	private static List<Restaurant> restaurantList = new ArrayList<>();
+	private static BorderPane root = new BorderPane();
+	private static Stack<Screen> screenStack = new Stack<>();
+	
+	private static SignInScreen signIn;
+	private static AvailabilityScreen availability;
 
 	@Override
 	public void start(Stage stage) {
@@ -25,36 +38,36 @@ public class Main extends Application {
 		try {		
 
 			//
-			// build restaurantList information
+			// build information
 
 			//////////////////////////////////////////
 			// This is a temporary impl so I can test out gui stuff.
+			allUsers.put("Dan", new User("Dan", "pass", true));
+			allUsers.put("User", new User("User", "123", false));
 			Map<DayMonthYear, WorkingDay> schedule = new HashMap<>();
 
-			DayMonthYear tomorrow = new DayMonthYear(13, 2, 2019);
-			WorkingDay exampleDay = new WorkingDay();
-			exampleDay.makeShift(new DayTime(18, 0), new DayTime(19, 30), 5, 10);
-			exampleDay.makeReservation("Dan", 3, new DayTime(18, 0));
+			DayMonthYear day = new DayMonthYear(21, 2, 2019);
+			
+			List<Shift> shifts = new ArrayList<>();
+			shifts.add(new Shift(new MealTime(new DayTime(18, 0), new DayTime(19, 30)), 5, 5));
+			List<Reservation> reservations = new ArrayList<>();
+			reservations.add(new Reservation(allUsers.get("Dan"), "Dan", 3, day, new DayTime(18, 0), ""));
 
-			schedule.put(tomorrow, exampleDay);
-			Restaurant rest = new Restaurant("Burger Joint", "123-456-7890", schedule);
-			List<Restaurant> restaurantList = new ArrayList<>();
+			Restaurant rest = new Restaurant("Burger Joint", "123-456-7890", schedule, 4);
+			rest.addWorkingDay(day, shifts, reservations);
 			restaurantList.add(rest);
 			/////////////////////////////////////////////
 
-			Scene initial = new Scene(root, 400, 400);
+			Scene initial = new Scene(root, 600, 600);
 			initial.getStylesheets().add(getClass().getResource("../gui/application.css").toExternalForm());
 
-			SignInScreen signIn = new SignInScreen();
-			AvailabilityScreen availability = new AvailabilityScreen(restaurantList);
-
 			// Setting up sign in
-			root.setCenter(signIn.getScreen());
+			signIn = new SignInScreen();
+			availability = new AvailabilityScreen();
 
-			// Checking out availability
-			root.setTop(availability.getTop());
-			root.setCenter(availability.getCenter());
-
+			screenStack.push(signIn);
+			changeScreen(signIn);
+			
 			stage.setTitle("Welcome");
 			stage.setScene(initial);
 			stage.show();
@@ -65,20 +78,94 @@ public class Main extends Application {
 		}
 	}
 
-	public static void updateExternal(Node top, Node left, Node center, Node right, Node bottom) {
+	public static void changeScreen(Screen screen) {
 
-		root.setTop(top);
-		root.setLeft(left);
-		root.setCenter(center);
-		root.setRight(right);
-		root.setBottom(bottom);
+		// If the screen is not the currently displayed screen
+		// no the != here is not a bug, literal memory address compare
+		if(!screenStack.isEmpty() && screenStack.peek() != screen) {
+			screenStack.push(screen);
+		}
+		
+		root.setTop(screen.getTop());
+		root.setLeft(screen.getLeft());
+		root.setCenter(screen.getCenter());
+		root.setRight(screen.getRight());
+		root.setBottom(screen.getBottom());
 	}
-
-	static void signIn() {
-		signedIn = true;
+	
+	public static void goToSignIn() {
+		changeScreen(signIn);
+	}
+	
+	public static void goToAvailability() {
+		availability.updateAvailability();
+		changeScreen(availability);
+	}
+	
+	public static void goToManageReservation() {
+		changeScreen(new ManageReservationScreen(loggedInUser));
+	}
+	
+	public static void goToManageRestaurants(Restaurant rest) {
+		changeScreen(new ManageRestaurantsScreen(rest));
+	}
+	
+	public static void goToCreateReservation(Restaurant rest, DayMonthYear dmy, Shift shift) {
+		changeScreen(new CreateReservationScreen(rest, dmy, shift));
+	}
+	
+	public static void goToUpdateShiftScreen(Shift shift) {
+		changeScreen(new UpdateShiftScreen(shift));
+	}
+	
+	public static void goToAddShiftScreen(List<Shift> shifts) {
+		changeScreen(new AddShiftScreen(shifts));		
+	}
+	
+	public static boolean stackHasSeveralItems() {
+		return screenStack.size() > 1;
+	}
+	
+	public static User getLoggedInUser() {
+		return loggedInUser;
+	}
+	
+	public static Map<String, User> getAllUsers() {
+		return allUsers;
+	}
+	
+	public static Screen backScreen() {
+		if(screenStack.size() > 1) {
+			screenStack.pop();
+			Screen screen = screenStack.peek();
+			changeScreen(screenStack.peek());
+			return screen;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public static void setLoggedIn(boolean logdIn, User user) {
+		loggedIn = logdIn;
+		loggedInUser = user;
+	}
+	
+	public static boolean isLoggedIn() {
+		return loggedIn;
 	}
 
 	public static void main(String[] args) {
 		launch(args);
 	}
+
+	public static List<Restaurant> getAllRestaurants() {
+		return restaurantList;
+	}
+
+	public static void clearScreenStack() {
+		screenStack.clear();
+		screenStack.push(signIn);
+	}
+	
 }

@@ -4,46 +4,70 @@ public class Shift implements Comparable<Shift> {
 
 	private MealTime mealTime;
 	private int floatingSeats;
-	private int stableSeats;
-	
-	public Shift(MealTime timespan, int floatingSeats, int stableSeats) {
+	private int numTables;
+
+	public Shift(MealTime timespan, int floatingSeats, int numTables) {
 		this.mealTime = timespan;
 		this.floatingSeats = floatingSeats;
-		this.stableSeats = stableSeats;
+		this.numTables = numTables;
 	}
-	
+
 	public MealTime getMealTime() {
 		return mealTime;
 	}
-	
+
 	public int getFloatingSeats() {
 		return floatingSeats;
 	}
 
-	public int getStableSeats() {
-		return stableSeats;
+	public int getNumTables() {
+		return numTables;
 	}
 	
-	public void bookSeats(int floating, int stable) {
-		floatingSeats -= floating;
-		stableSeats -= stable;
+	public boolean modifySeats(int floatingSeats, int numTables) {
+		
+		// they will pass in negatives to subtract
+		if(this.floatingSeats + floatingSeats < 0 || this.numTables + numTables < 0) {
+			return false;
+		}
+		else {
+			this.floatingSeats += floatingSeats;
+			this.numTables += numTables;
+			return true;
+		}
+	}
+
+	public void bookSeats(int overFlowSeats) {
+		if(overFlowSeats > 0) {
+			floatingSeats -= overFlowSeats;
+		}
+		numTables -= 1;
+	}
+	
+	public void clearSeats(int overFlowSeats) {
+		if(overFlowSeats > 0) {
+			floatingSeats += overFlowSeats;
+		}
+		numTables += 1;
 	}
 
 	@Override
 	public int compareTo(Shift o) {
-		
+
 		return mealTime.getStartTime().compareTo(o.mealTime.getStartTime());
 	}
 
 	@Override
 	public String toString() {
-		
+
 		StringBuilder sb = new StringBuilder();
-		sb.append(mealTime);
-		sb.append("  ");
-		sb.append(floatingSeats + stableSeats);
-		sb.append(" open seats");
-		
+		sb.append(mealTime)
+		.append("  ")
+		.append(numTables)
+		.append(" open tables ")
+		.append(floatingSeats)
+		.append(" floating seats");
+
 		return sb.toString();
 	}
 }

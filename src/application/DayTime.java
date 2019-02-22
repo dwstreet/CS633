@@ -10,10 +10,10 @@ public class DayTime implements Comparable<DayTime> {
 	}
 	
 	public DayTime(int hour, int minute) {
-		if(hour < 0 || hour > 24) {
+		if(hour < 0 || hour > 23) {
 			throw new IllegalStateException("Illegal hour supplied, was: " + hour);
 		}
-		if(minute < 0 || minute > 60) {
+		if(minute < 0 || minute > 59) {
 			throw new IllegalStateException("Illegal minute supplied, was: " + minute);
 		}
 		

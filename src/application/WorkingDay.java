@@ -5,23 +5,29 @@ import java.util.List;
 
 public class WorkingDay {
 
+	private DayMonthYear dmy;
 	private List<Shift> shifts;
 	private List<Reservation> reservations;
+	private int regularTableSeats;
 
-	public WorkingDay() {
+	public WorkingDay(int regularTableSeats) {
 
+		dmy = DayMonthYear.today();
 		shifts = new ArrayList<>();
 		reservations = new ArrayList<>();
+		this.regularTableSeats = regularTableSeats;
 	}
 	
-	public WorkingDay(List<Shift> mealTimes, List<Reservation> reservations) {
+	public WorkingDay(DayMonthYear dmy, List<Shift> mealTimes, List<Reservation> reservations, int regularTableSeats) {
 		
+		this.dmy = dmy;
 		this.shifts = mealTimes;
 		this.reservations = reservations;
+		this.regularTableSeats = regularTableSeats;
 	}
 
-	public void makeShift(DayTime startTime, DayTime endTime, int floatingSeats, int stableSeats) {
-		shifts.add(new Shift(new MealTime(startTime, endTime), floatingSeats, stableSeats));
+	public void makeShift(DayTime startTime, DayTime endTime, int floatingSeats, int numTables) {
+		shifts.add(new Shift(new MealTime(startTime, endTime), floatingSeats, numTables));
 	}
 	
 	public boolean isClosed() {
@@ -36,13 +42,12 @@ public class WorkingDay {
 		return !shifts.isEmpty();
 	}
 	
-	public void makeReservation(String partyName, int partyNumber, DayTime seatTime) {
-
-		reservations.add(new Reservation(partyName, partyNumber, seatTime));		
+	public DayMonthYear getDayMonthYear() {
+		return dmy;
 	}
 
 	// This may be used by other screens
-	public List<Reservation> getReservations(int year, int month, int day) {
+	public List<Reservation> getReservations() {
 
 		return reservations;
 	}
@@ -53,16 +58,30 @@ public class WorkingDay {
 	}
 
 	// This may be used by other screens
-	public int getStableSeats(Shift time) {
-		return time.getStableSeats();
+	public int getAvailableTables(Shift time) {
+		return time.getNumTables();
 	}
 
-	public boolean canBook(String partyName, int partyOf, DayTime seatTime) {
+	public boolean canBook(User user, String partyName, int partyOf, DayTime seatTime) {
 		
 		Shift shift = findShift(seatTime);
-
+		
 		// Ensure the party size is small enough and not already booked
-		return partyOf < (shift.getFloatingSeats() + shift.getStableSeats()) && !reservations.contains(new Reservation(partyName, partyOf, seatTime));
+		return partyOf <= (shift.getFloatingSeats() + regularTableSeats) && !reservations.contains(new Reservation(user, partyName, partyOf, dmy, seatTime, ""));
+	}
+	
+	public void makeReservation(User user, String partyName, int partyNumber, DayTime seatTime, String notes) {
+
+		Shift shift = findShift(seatTime);
+		shift.bookSeats(partyNumber - regularTableSeats);
+		reservations.add(new Reservation(user, partyName, partyNumber, dmy, seatTime, notes));
+	}
+	
+	public void removeReservation(Reservation resv) {
+		
+		reservations.remove(resv);
+		Shift shift = findShift(resv.getSeatTime());
+		shift.clearSeats(resv.getPartyNumber() - regularTableSeats);
 	}
 	
 	private Shift findShift(DayTime seatTime) {
@@ -92,5 +111,5 @@ public class WorkingDay {
 			// no available shift nearby return empty
 			return new Shift(new MealTime(DayTime.makeMidnight(), DayTime.makeMidnight()), 0, 0);
 		}
-	}
+	}	
 }

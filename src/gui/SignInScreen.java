@@ -1,5 +1,7 @@
 package gui;
 
+import application.Main;
+import application.User;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -11,9 +13,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class SignInScreen {
+public class SignInScreen implements Screen {
 	
+	private VBox top;
+	private VBox left;
 	private VBox center;
+	private VBox right;
+	private VBox bottom;
 
 	public SignInScreen() {
 		
@@ -25,22 +31,36 @@ public class SignInScreen {
 		Button guest = new Button("Continue as Guest");
 		Button signIn = new Button("Sign In");
 
-		guest.setOnAction( event -> System.out.println("Guest Pressed") /* move on as guest */);
+		guest.setOnAction( event -> Main.goToAvailability());
 		signIn.setOnAction( event -> 
 			{ 
 
 				Alert alert = new Alert(AlertType.CONFIRMATION);
 				alert.setTitle("Log-in Result");
-				if(doSignin(username.getText(), password.getText())) {
+				String user = username.getText();
+				String pass = password.getText();
+				
+				User userToCheck = Main.getAllUsers().get(user);
+				if(doSignIn(userToCheck, pass)) {
 					// log-in
 					alert.setContentText("Log-in Success!");
+					alert.showAndWait();
+					Main.setLoggedIn(true, userToCheck);
+					
+					// If the sign-in was reached from another screen (e.g. create reservation)
+					// then go back to that screen otherwise go to availability.
+					if(Main.stackHasSeveralItems()) {
+						Main.backScreen();
+					}
+					else {
+						Main.goToAvailability();
+					}
 				}
 				else {
 					// display error
 					alert.setContentText("Wrong Username or password!");
+					alert.showAndWait();
 				}
-			
-				alert.showAndWait();
 			}
 		);
 		
@@ -65,13 +85,33 @@ public class SignInScreen {
 		center.setAlignment(Pos.CENTER);	
 	}
 	
-	public Node getScreen() {
-		return center;
+	private boolean doSignIn(User user, String pass) {
+
+		return user.authenticate(pass);
 	}
 	
-	private boolean doSignin(String user, String pass) {
-		
-		
-		return user.equals("Dan") && pass.equals("pass");
+	@Override
+	public Node getTop() {
+		return top;
+	}
+
+	@Override
+	public Node getLeft() {
+		return left;
+	}
+
+	@Override
+	public Node getCenter() {
+		return center;
+	}
+
+	@Override
+	public Node getRight() {
+		return right;
+	}
+
+	@Override
+	public Node getBottom() {
+		return bottom;
 	}
 }
