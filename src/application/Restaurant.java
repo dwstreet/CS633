@@ -76,13 +76,11 @@ public class Restaurant {
 
 	public boolean addWorkingDay(DayMonthYear date, List<Shift> shifts, List<Reservation> reservations) {
 
-		//This information should be passed upwards to the GUI. 
-		
+		// TODO - I dunno if doing something with this false matters
+		// the check is definitely important though
 		if(schedule.containsKey(date) || date.before(DayMonthYear.today())) {
 			
 			return false;
-//			throw new RuntimeException("This date cannot be added because a working day already exists or the day "
-//					+ "scheduled occurs before today.");
 		}
 
 		schedule.put(date, new WorkingDay(date, shifts, reservations, tableSeats));

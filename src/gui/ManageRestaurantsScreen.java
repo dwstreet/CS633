@@ -58,20 +58,8 @@ public class ManageRestaurantsScreen implements Screen {
 
 	public void buildCenterDisplay() {
 
-		Button addShift = new Button("Add shift");
-		addShift.setAlignment(Pos.CENTER);
-		addShift.setOnAction( event -> {
-			Main.goToAddShiftScreen(new ArrayList<>());
-		});
-
-		Button addWorkingDay = new Button("Add working day");
-		addWorkingDay.setOnAction( event -> {
-			//todo
-		});
-		
 		center = new VBox(5);
 		center.setAlignment(Pos.CENTER);
-		center.getChildren().add(addShift);
 
 		int day = datePicker.getValue().getDayOfMonth();
 		int month = datePicker.getValue().getMonthValue();
@@ -83,27 +71,48 @@ public class ManageRestaurantsScreen implements Screen {
 		if(workDay != null) {
 
 			List<Shift> shifts = workDay.getShifts();
-			shifts.sort(null);
 			
+			Button addShift = new Button("Add shift");
+			addShift.setAlignment(Pos.CENTER);
 			addShift.setOnAction( event -> {
 				Main.goToAddShiftScreen(shifts);
 			});
+			
+			if(!shifts.isEmpty()) {
+				
+				shifts.sort(null);
 
-			for(Shift shift : shifts) {
-				HBox box = new HBox(2);
-				box.setAlignment(Pos.CENTER);
+				center.getChildren().add(addShift);
+				
+				for(Shift shift : shifts) {
+					HBox box = new HBox(2);
+					box.setAlignment(Pos.CENTER);
 
-				Button updateShift = new Button("Update");
-				updateShift.setOnAction( event -> {
-					Main.goToUpdateShiftScreen(shift);
-				});
+					Button updateShift = new Button("Update");
+					updateShift.setOnAction( event -> {
+						Main.goToUpdateShiftScreen(shift);
+					});
 
-				box.getChildren().addAll(new Label(shift.toString()), updateShift);
-				center.getChildren().add(box);
+					box.getChildren().addAll(new Label(shift.toString()), updateShift);
+					
+					center.getChildren().add(box);
+				}
+			}
+			else {
+				center.getChildren().add(new Label("There are no shifts on this date."));
+				center.getChildren().add(addShift);
 			}
 		}
 		else {
-			center.getChildren().add(new Label("There are no shifts on this date."));
+
+			Button addWorkingDay = new Button("Add working day");
+			addWorkingDay.setOnAction( event -> {
+				rest.addWorkingDay(year, month, day, new ArrayList<>(), new ArrayList<>());
+				buildCenterDisplay();
+				update();
+			});
+
+			center.getChildren().addAll(new Label("This is not a working day."), addWorkingDay);
 		}
 	}
 

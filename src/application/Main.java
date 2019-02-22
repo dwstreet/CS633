@@ -38,7 +38,7 @@ public class Main extends Application {
 		try {		
 
 			//
-			// build restaurantList information
+			// build information
 
 			//////////////////////////////////////////
 			// This is a temporary impl so I can test out gui stuff.
@@ -120,10 +120,6 @@ public class Main extends Application {
 	
 	public static void goToAddShiftScreen(List<Shift> shifts) {
 		changeScreen(new AddShiftScreen(shifts));		
-	}
-	
-	public static void goToManageWorkingDaysScreen(WorkingDay workDay) {
-		// TODO Auto-generated method stub	
 	}
 	
 	public static boolean stackHasSeveralItems() {
