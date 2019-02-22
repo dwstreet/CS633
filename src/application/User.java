@@ -4,10 +4,12 @@ public class User {
 
 	private String userName;
 	private String password;
+	private boolean isAdmin;
 	
-	public User(String userName, String password) {
+	public User(String userName, String password, boolean isAdmin) {
 		this.userName = userName;
 		this.password = password;
+		this.isAdmin = isAdmin;
 	}
 	
 	public String getUserName() {
@@ -16,6 +18,10 @@ public class User {
 	
 	public String getPassword() {
 		return password;
+	}
+	
+	public boolean getIsAdmin() {
+		return isAdmin;
 	}
 	
 	public boolean authenticate(String password) {

@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import com.sun.media.sound.AlawCodec;
 
 import application.Main;
 import application.Reservation;
@@ -14,8 +11,8 @@ import application.Restaurant;
 import application.User;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -62,6 +59,8 @@ public class ManageReservationScreen implements Screen {
 					alert.setTitle("Cancel Reservation");
 					alert.setContentText("This reservation was canceled.");
 					alert.showAndWait();
+					Main.clearScreenStack();
+					Main.goToAvailability();
 				});
 				
 				box.getChildren().addAll(new Label(entry.getKey().toString() + ": " + resv.toString()), cancel);

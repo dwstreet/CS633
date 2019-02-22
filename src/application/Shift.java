@@ -23,6 +23,19 @@ public class Shift implements Comparable<Shift> {
 	public int getNumTables() {
 		return numTables;
 	}
+	
+	public boolean modifySeats(int floatingSeats, int numTables) {
+		
+		// they will pass in negatives to subtract
+		if(this.floatingSeats + floatingSeats < 0 || this.numTables + numTables < 0) {
+			return false;
+		}
+		else {
+			this.floatingSeats += floatingSeats;
+			this.numTables += numTables;
+			return true;
+		}
+	}
 
 	public void bookSeats(int overFlowSeats) {
 		if(overFlowSeats > 0) {

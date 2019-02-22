@@ -20,7 +20,7 @@ import javafx.scene.text.TextAlignment;
 
 public class AvailabilityScreen implements Screen {
 
-	private HBox top;
+	private VBox top;
 	private VBox left;
 	private VBox center;
 	private VBox right;
@@ -48,10 +48,6 @@ public class AvailabilityScreen implements Screen {
 			buildCenterDisplay(); 
 			updateAvailability();
 		});
-
-		top = new HBox();
-		top.getChildren().addAll(restComboBox, datePicker);
-		top.setAlignment(Pos.CENTER);		
 
 		bottom = new VBox(5);
 		Restaurant rest = restComboBox.getValue();
@@ -101,6 +97,23 @@ public class AvailabilityScreen implements Screen {
 
 	@Override
 	public Node getTop() {
+		
+		top = new VBox();
+		HBox standard = new HBox(5);
+		standard.getChildren().addAll(restComboBox, datePicker);
+		standard.setAlignment(Pos.CENTER);
+		top.getChildren().add(standard);
+		top.setAlignment(Pos.CENTER);
+		
+		if(Main.isLoggedIn() && Main.getLoggedInUser().getIsAdmin()) {
+			Button manageRestaurants = new Button("Manage Restaurants");
+			manageRestaurants.setOnAction( event -> {
+				Main.goToManageRestaurants(restComboBox.getValue());
+			});
+			manageRestaurants.setAlignment(Pos.CENTER);
+			top.getChildren().add(manageRestaurants);
+		}
+		
 		return top;
 	}
 

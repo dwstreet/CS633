@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import gui.AddShiftScreen;
 import gui.AvailabilityScreen;
 import gui.CreateReservationScreen;
 import gui.ManageReservationScreen;
+import gui.ManageRestaurantsScreen;
 import gui.Screen;
 import gui.SignInScreen;
+import gui.UpdateShiftScreen;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -39,7 +42,8 @@ public class Main extends Application {
 
 			//////////////////////////////////////////
 			// This is a temporary impl so I can test out gui stuff.
-			allUsers.put("Dan", new User("Dan", "pass"));
+			allUsers.put("Dan", new User("Dan", "pass", true));
+			allUsers.put("User", new User("User", "123", false));
 			Map<DayMonthYear, WorkingDay> schedule = new HashMap<>();
 
 			DayMonthYear day = new DayMonthYear(21, 2, 2019);
@@ -102,12 +106,24 @@ public class Main extends Application {
 		changeScreen(new ManageReservationScreen(loggedInUser));
 	}
 	
-	public static void goToManageRestaurants() {
-		changeScreen(null);
+	public static void goToManageRestaurants(Restaurant rest) {
+		changeScreen(new ManageRestaurantsScreen(rest));
 	}
 	
 	public static void goToCreateReservation(Restaurant rest, DayMonthYear dmy, Shift shift) {
 		changeScreen(new CreateReservationScreen(rest, dmy, shift));
+	}
+	
+	public static void goToUpdateShiftScreen(Shift shift) {
+		changeScreen(new UpdateShiftScreen(shift));
+	}
+	
+	public static void goToAddShiftScreen(List<Shift> shifts) {
+		changeScreen(new AddShiftScreen(shifts));		
+	}
+	
+	public static void goToManageWorkingDaysScreen(WorkingDay workDay) {
+		// TODO Auto-generated method stub	
 	}
 	
 	public static boolean stackHasSeveralItems() {
@@ -122,10 +138,15 @@ public class Main extends Application {
 		return allUsers;
 	}
 	
-	public static void backScreen() {
-		if(!screenStack.isEmpty()) {
+	public static Screen backScreen() {
+		if(screenStack.size() > 1) {
 			screenStack.pop();
+			Screen screen = screenStack.peek();
 			changeScreen(screenStack.peek());
+			return screen;
+		}
+		else {
+			return null;
 		}
 	}
 	
@@ -145,4 +166,10 @@ public class Main extends Application {
 	public static List<Restaurant> getAllRestaurants() {
 		return restaurantList;
 	}
+
+	public static void clearScreenStack() {
+		screenStack.clear();
+		screenStack.push(signIn);
+	}
+	
 }

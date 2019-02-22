@@ -58,7 +58,7 @@ public class WorkingDay {
 	}
 
 	// This may be used by other screens
-	public int getStableSeats(Shift time) {
+	public int getAvailableTables(Shift time) {
 		return time.getNumTables();
 	}
 
