@@ -1,3 +1,7 @@
+For access to the prebuilt executable please access the master branch and download the file "Reservations"
+
+Setting up a the development environment instructions are below.
+
 # CS633
 Reservation System
 
